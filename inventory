@@ -1,0 +1,17 @@
+[all]
+192.168.28.71
+192.168.28.72
+192.168.28.73 
+
+[all:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=/home/geek/.vagrant.d/insecure_private_key
+
+[elastic]
+192.168.28.71
+
+[kibana]
+192.168.28.72
+
+[logstash]
+192.168.28.73
