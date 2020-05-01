@@ -121,7 +121,7 @@
       become: yes
       blockinfile:
          path: /etc/logstash/conf.d/main.conf
-         marker: "# Ansible"
+         marker: ""
          block: |
            input {
              beats {
@@ -159,7 +159,7 @@
       become: yes
       blockinfile:
          path: /etc/filebeat/filebeat.yml
-         marker: "# Ansible Block"
+         marker: ""
          block: |
            filebeat.inputs:
            - type: log
