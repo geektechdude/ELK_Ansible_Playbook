@@ -1,0 +1,41 @@
+---
+- name: Download Filebeat Package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.2-amd64.deb
+    dest: /tmp
+
+- name: Install FileBeat Deb Package
+  become: yes
+  apt:
+    deb: /tmp/filebeat-7.6.2-amd64.deb
+
+- name: Remove FileBeat YAML File
+  become: yes
+  file:
+    path: /etc/filebeat/filebeat.yml
+    state: absent
+
+- name: Create New FileBeat YAML File
+  become: yes
+  file:
+      path: /etc/filebeat/filebeat.yml
+      state: touch
+
+- name: Add FileBeat YAML Configuration
+  become: yes
+  blockinfile:
+      path: /etc/filebeat/filebeat.yml
+      marker: ""
+      block: |
+        filebeat.inputs:
+        - type: log
+          paths:
+          - /var/log/*.log
+        output.logstash:
+          hosts: ["localhost:5044"]
+      
+- name: Start FileBeat Service
+  become: yes
+  service:
+    name: filebeat
+    state: started

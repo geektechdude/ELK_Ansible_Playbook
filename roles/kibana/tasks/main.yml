@@ -1,0 +1,30 @@
+---
+- name: Download Kibana Deb Package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/kibana/kibana-7.6.2-amd64.deb
+    dest: /tmp
+
+- name: Install Kibana Deb Package
+  become: yes
+  apt:
+    deb: /tmp/kibana-7.6.2-amd64.deb
+
+- name: Update Kibana Config (IP Address)
+  become: yes
+  lineinfile:
+    destfile: /etc/kibana/kibana.yml
+    regexp: 'server.host'
+    line: 'server.host: "0.0.0.0"'
+
+- name: Update Kibana Config (Kibana URL)
+  become: yes
+  lineinfile:
+    destfile: /etc/kibana/kibana.yml
+    regexp: 'elasticsearch.hosts'
+    line: 'elasticsearch.hosts: ["http://192.168.28.71:9200"]'
+
+- name: Start Kibana Service
+  become: yes
+  service:
+    name: kibana
+    state: started

@@ -1,0 +1,35 @@
+---
+- hosts: all
+  gather_facts: yes
+
+  pre_tasks:
+    - name: update apt cache if needed
+      become: yes
+      apt:
+        update_cache=yes
+        cache_valid_time=3600
+
+  tasks:
+    - name: Install Java Runtime Environment 
+      become: yes
+      apt:
+       name: default-jre
+       state: present
+
+- hosts: elastic  
+  roles:
+    - elastic
+
+- hosts: kibana
+  roles:
+    - kibana
+
+- hosts: logstash
+  roles:
+    - logstash
+
+- hosts: logstash
+  roles:
+    - filebeat
+
+    

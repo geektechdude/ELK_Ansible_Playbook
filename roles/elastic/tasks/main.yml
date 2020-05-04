@@ -1,0 +1,43 @@
+---
+- name: Download Elastic Deb Package
+  get_url:
+    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb
+    dest: /tmp
+
+- name: Install Elastic Deb Package
+  become: yes
+  apt:
+    deb: /tmp/elasticsearch-7.6.2-amd64.deb
+
+- name: Update Elastic Config (IP Address to 0.0.0.0)
+  become: yes
+  lineinfile:
+    destfile: /etc/elasticsearch/elasticsearch.yml
+    regexp: 'network.host'
+    line: 'network.host: 0.0.0.0'
+
+- name: Updating Elastic Config (Port Number)
+  become: yes
+  lineinfile:
+    destfile: /etc/elasticsearch/elasticsearch.yml
+    regexp: 'http.port'
+    line: 'http.port: 9200'
+
+- name: Updating Elastic Config (Node Name)
+  become: yes
+  lineinfile:
+    destfile: /etc/elasticsearch/elasticsearch.yml
+    regexp: '#node.name: node-1'
+    line: 'node.name: node-1'
+  
+- name: Updating Elastic Config (Cluster Initial Master Nodes)
+  become: yes
+  lineinfile:
+    destfile: /etc/elasticsearch/elasticsearch.yml
+    line: 'cluster.initial_master_nodes: ["node-1"]'   
+  
+- name: Start ElasticSearch Service
+  become: yes
+  service:
+    name: elasticsearch
+    state: started
