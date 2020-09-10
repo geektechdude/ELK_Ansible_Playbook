@@ -1,13 +1,32 @@
 ---
+- name: Include variables
+  include_vars:
+    file: ../../vars.yml
+    
 - name: Download Filebeat Package
   get_url:
-    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.2-amd64.deb
-    dest: /tmp
+    url: "{{ filebeat_url }}{{ filebeat_version }}.deb"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Download Filebeat Package
+  get_url:
+    url: "{{ filebeat_url }}{{ filebeat_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="CentOS"
 
 - name: Install FileBeat Deb Package
   become: yes
   apt:
-    deb: /tmp/filebeat-7.6.2-amd64.deb
+    deb: "{{ download }}/{{ filebeat_version }}.deb"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Install FileBeat Yum Package
+  become: yes
+  yum:
+    name: "{{ download }}/{{ filebeat_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="CentOS"
 
 - name: Remove FileBeat YAML File
   become: yes
