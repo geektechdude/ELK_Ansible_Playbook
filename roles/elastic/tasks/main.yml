@@ -1,43 +1,30 @@
 ---
+- name: Include variables
+  include_vars:
+    file: ../../vars.yml
+
 - name: Download Elastic Deb Package
   get_url:
-    url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb
-    dest: /tmp
+    url: "{{ elastic_url }}{{ elastic_version }}-amd64.deb"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Download Elastic Yum Package
+  get_url:
+    url: "{{ elastic_url }}{{ elastic_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="CentOS"
 
 - name: Install Elastic Deb Package
   become: yes
   apt:
-    deb: /tmp/elasticsearch-7.6.2-amd64.deb
+    deb: "{{ download }}/{{ elastic_version }}-amd64.deb"
+  when: ansible_facts['distribution']=="Ubuntu"
 
-- name: Update Elastic Config (IP Address to 0.0.0.0)
+- name: Install Elastic Yum Package
   become: yes
-  lineinfile:
-    destfile: /etc/elasticsearch/elasticsearch.yml
-    regexp: 'network.host'
-    line: 'network.host: 0.0.0.0'
-
-- name: Updating Elastic Config (Port Number)
-  become: yes
-  lineinfile:
-    destfile: /etc/elasticsearch/elasticsearch.yml
-    regexp: 'http.port'
-    line: 'http.port: 9200'
-
-- name: Updating Elastic Config (Node Name)
-  become: yes
-  lineinfile:
-    destfile: /etc/elasticsearch/elasticsearch.yml
-    regexp: '#node.name: node-1'
-    line: 'node.name: node-1'
+  yum:
+    name: "{{ download }}/{{ elastic_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="CentOS"
   
-- name: Updating Elastic Config (Cluster Initial Master Nodes)
-  become: yes
-  lineinfile:
-    destfile: /etc/elasticsearch/elasticsearch.yml
-    line: 'cluster.initial_master_nodes: ["node-1"]'   
-  
-- name: Start ElasticSearch Service
-  become: yes
-  service:
-    name: elasticsearch
-    state: started
