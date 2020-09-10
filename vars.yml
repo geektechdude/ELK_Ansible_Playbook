@@ -1,0 +1,92 @@
+---
+# Variables for use with Elastic_Ansible playbook_with_roles.yml
+
+# CentOS needs to know the Java version to use
+jre_version: java-1.8.0-openjdk
+
+# Download location
+download: /tmp
+
+
+# ELASTIC
+
+# Elastic download URL
+elastic_url: https://artifacts.elastic.co/downloads/elasticsearch/
+
+# Elastic version (e.g. elasticsearch-7.9.0)
+elastic_version: elasticsearch-7.9.0
+
+# Elasticsearch configuration YAML path
+elastic_yaml: /etc/elasticsearch/elasticsearch.yml
+
+# Elasticsearch clustername
+elastic_cluster_name: geektechstuff
+
+# Elastic port (e.g. 9200)
+elastic_port: 9200
+
+# Elastic Discovery Seeds
+elastic_discovery_seeds: '"elk1", "elk2"'
+
+# Elastic Initial Master Nodes:
+elastic_master_nodes: '"elk1", "elk2"'
+
+
+# KIBANA
+
+# Kibana download URL
+kibana_url: https://artifacts.elastic.co/downloads/kibana/
+
+# Kibana version (e.g. kibana-7.6.2)
+kibana_version: kibana-7.9.0
+
+# Kibana port (e.g. 5601)
+kibana_port: 5601
+
+
+# LOGSTASH
+
+# Logstash download URL
+logstash_url: https://artifacts.elastic.co/downloads/logstash/
+
+# Logstash version (e.g. logstash-7.6.2)
+logstash_version: logstash-7.9.0
+
+# Logstash port (e.g. 5044)
+logstash_port: 5044
+
+
+# FILEBEAT
+
+# Filebeat download URL
+filebeat_url: https://artifacts.elastic.co/downloads/beats/filebeat/
+
+# Filebeat version (e.g. filebeat-7.6.2)
+filebeat_version: filebeat-7.9.0
+
+
+# METRICBEAT
+
+# Metricbeat download URL
+metricbeat_url: https://artifacts.elastic.co/downloads/beats/metricbeat/
+
+# Metricbeat version (e.g. metricbeat-7.9.0)
+metricbeat_version: metricbeat-7.9.0
+
+
+# HEARTBEAT
+
+# Heartbeat download URL
+heartbeat_url: https://artifacts.elastic.co/downloads/beats/heartbeat/
+
+# Heartbeat version (e.g. heartbeat-7.9.0)
+heartbeat_version: heartbeat-7.9.0
+
+
+# AUDITBEAT
+
+# Auditbeat download URL
+auditbeat_url: https://artifacts.elastic.co/downloads/beats/auditbeat/
+
+# Auditbeat version (e.g. auditbeat-7.9.0)
+auditbeat_version: auditbeat-7.9.0
