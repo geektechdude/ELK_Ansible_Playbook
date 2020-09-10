@@ -1,0 +1,60 @@
+---
+- name: Include variables
+  include_vars:
+    file: ../../vars.yml
+    
+- name: Download auditbeat Package
+  get_url:
+    url: "{{ auditbeat_url }}{{ auditbeat_version }}.deb"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Download auditbeat Package
+  get_url:
+    url: "{{ auditbeat_url }}{{ auditbeat_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="CentOS"
+
+- name: Install auditbeat Deb Package
+  become: yes
+  apt:
+    deb: "{{ download }}/{{ auditbeat_version }}.deb"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Install auditbeat Yum Package
+  become: yes
+  yum:
+    name: "{{ download }}/{{ auditbeat_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="CentOS"
+
+- name: Remove auditbeat YAML File
+  become: yes
+  file:
+    path: /etc/auditbeat/auditbeat.yml
+    state: absent
+
+- name: Create New auditbeat YAML File
+  become: yes
+  file:
+      path: /etc/auditbeat/auditbeat.yml
+      state: touch
+
+- name: Add auditbeat YAML Configuration
+  become: yes
+  blockinfile:
+      path: /etc/auditbeat/auditbeat.yml
+      marker: ""
+      block: |
+        auditbeat.inputs:
+        - type: log
+          paths:
+          - /var/log/*.log
+        output.logstash:
+          hosts: ["localhost:5044"]
+      
+- name: Start auditbeat Service
+  become: yes
+  service:
+    name: auditbeat
+    state: started

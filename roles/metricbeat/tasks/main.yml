@@ -1,0 +1,60 @@
+---
+- name: Include variables
+  include_vars:
+    file: ../../vars.yml
+    
+- name: Download metricbeat Package
+  get_url:
+    url: "{{ metricbeat_url }}/{{ metricbeat_version }}.deb"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Download metricbeat Package
+  get_url:
+    url: "{{ metricbeat_url }}{{ metricbeat_version }}-x86_64.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="CentOS"
+
+- name: Install metricbeat Deb Package
+  become: yes
+  apt:
+    deb: "{{ download }}{{ metricbeat_version }}.deb"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Install metricbeat Yum Package
+  become: yes
+  yum:
+    name: "{{ download }}/{{ metricbeat_version }}-x86_64.rpm"
+    state: present
+  when: ansible_facts['distribution']=="CentOS"
+
+- name: Remove metricbeat YAML File
+  become: yes
+  file:
+    path: /etc/metricbeat/metricbeat.yml
+    state: absent
+
+- name: Create New metricbeat YAML File
+  become: yes
+  file:
+      path: /etc/metricbeat/metricbeat.yml
+      state: touch
+
+- name: Add metricbeat YAML Configuration
+  become: yes
+  blockinfile:
+      path: /etc/metricbeat/metricbeat.yml
+      marker: ""
+      block: |
+        metricbeat.inputs:
+        - type: log
+          paths:
+          - /var/log/*.log
+        output.logstash:
+          hosts: ["localhost:5044"]
+      
+- name: Start metricbeat Service
+  become: yes
+  service:
+    name: metricbeat
+    state: started
