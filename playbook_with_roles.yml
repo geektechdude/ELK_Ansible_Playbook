@@ -2,12 +2,22 @@
 - hosts: all
   gather_facts: yes
 
+  vars_files:
+    - vars.yml
+
   pre_tasks:
     - name: update apt cache if needed
       become: yes
       apt:
         update_cache=yes
         cache_valid_time=3600
+      when: ansible_facts['distribution']=="Ubuntu"
+
+    - name: update yum cache if needed
+      become: yes
+      yum:
+        update_cache=yes
+      when: ansible_facts['distribution']=="CentOS"
 
   tasks:
     - name: Install Java Runtime Environment 
@@ -15,10 +25,30 @@
       apt:
        name: default-jre
        state: present
+      when: ansible_facts['distribution']=="Ubuntu"
 
+    - name: Install Java Runtime Environment 
+      become: yes
+      yum:
+       name: "{{ jre_version }}"
+       state: present
+      when: ansible_facts['distribution']=="CentOS"
+
+- hosts: all
+  roles:
+    - hosts_update_for_testing
+    
 - hosts: elastic  
   roles:
     - elastic
+
+- hosts: elastic_master
+  roles:
+    - elastic_master
+
+- hosts: elastic_datanode
+  roles:
+    - elastic_datanode
 
 - hosts: kibana
   roles:
@@ -27,9 +57,3 @@
 - hosts: logstash
   roles:
     - logstash
-
-- hosts: logstash
-  roles:
-    - filebeat
-
-    
