@@ -1,13 +1,32 @@
 ---
+- name: Include variables
+  include_vars:
+    file: ../../vars.yml
+    
 - name: Download Logstash Deb Package
   get_url:
-    url: https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.deb
-    dest: /tmp
+    url: "{{ logstash_url }}{{logstash_version }}.deb"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Download Logstash Yum Package
+  get_url:
+    url: "{{ logstash_url }}{{logstash_version }}.rpm"
+    dest: "{{ download }}"
+  when: ansible_facts['distribution']=="CentOS"
     
 - name: Install Logstash Deb Package
   become: yes
   apt:
-    deb: /tmp/logstash-7.6.2.deb
+    deb: "{{ download }}/{{logstash_version }}.deb"
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: Install Logstash Yum Package
+  become: yes
+  yum:
+    name: "{{ download }}/{{logstash_version }}.rpm"
+    state: present
+  when: ansible_facts['distribution']=="CentOS"
 
 - name: Create Logstash Pipeline File
   become: yes
